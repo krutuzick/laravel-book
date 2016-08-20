@@ -35,6 +35,8 @@ services:
       context: ../..
     env_file:
       - ../../.env
+    environment:
+      - HOME=/tmp
     volumes:
       - ../..:/var/www
     depends_on:
