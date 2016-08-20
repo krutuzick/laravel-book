@@ -1,0 +1,69 @@
+version: '2'
+
+
+volumes:
+
+  dbdata:
+    driver: local
+
+  redisdata:
+    driver: local
+
+
+services:
+
+  web:
+    build:
+      dockerfile: env/docker/web/Dockerfile
+      context: ../..
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../docker/web/conf.d:/etc/nginx/conf.d
+      - ../..:/var/www
+    depends_on:
+      - app
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  app:
+    build:
+      dockerfile: env/docker/app/Dockerfile
+      context: ../..
+    env_file:
+      - ../../.env
+    volumes:
+      - ../..:/var/www
+    depends_on:
+      - db
+      - redisdb
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  redisdb:
+    build: ../docker/redisdb
+    volumes:
+      - redisdata:/data
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "2"
+
+  db:
+    build: ../docker/db
+    ports:
+      - "9432:5432"
+    environment:
+      POSTGRES_PASSWORD: "DBpass12345"
+      POSTGRES_USER: "laravel"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "2"
