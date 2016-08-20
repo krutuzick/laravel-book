@@ -25,6 +25,8 @@ do
 done
 echo
 
+sleep 3
+
 ./run.sh bin/composer-install.sh
 
 ./run.sh bin/migrate.sh
